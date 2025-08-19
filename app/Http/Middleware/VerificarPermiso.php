@@ -21,7 +21,7 @@ class VerificarPermiso
 
         // Realizar comprobación si existe usuario autenticado o no tiene permiso
         if (!$usuario || !$usuario->tienePermiso($accionNombre)) {
-            abort(403, 'No tienees permiso para esta acción');
+            abort(403, 'No tienes permiso para esta acción');
         }
 
         return $next($request);

@@ -25,9 +25,13 @@ class Usuarios extends Authenticatable
         return $this->belongsTo('App\Models\Roles', 'id_rol');
     }
 
+    public function permiso(){
+        return $this->hasMany('App\Models\Permisos', 'usuario_id');
+    }
+
     // Definir el helper(función global) para comprobar si el usuario tiene permisos
     public function tienePermiso($nombreAccion) {
-        return $this->rol && $this->rol->permisos->contains(function ($permiso) use($nombreAccion){
+        return $this->rol && $this->permiso->contains(function ($permiso) use($nombreAccion){
             return $permiso->accion->nombre === $nombreAccion;
         });
     }

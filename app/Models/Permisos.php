@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Permisos extends Model
 {
     public $fillable = [
-        'rol_id',
+        'usuario_id',
         'accion_id'
     ];
 
-    // Relación con el rol
-    public function rol(){
-        return $this->belongsTo('App\Models\Roles', 'rol_id');
+    // Relación con el usuario
+    public function usuario(){
+        return $this->belongsTo('App\Models\Usuarios', 'usuario_id');
     }
 
     // Relación con la tabla acciones

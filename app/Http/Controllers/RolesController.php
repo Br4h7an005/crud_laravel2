@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class RolesController extends Controller
 {
+
+    public function __construct(){
+        $this->middleware('verificar:ver_roles')->only('index');
+        $this->middleware('verificar:crear_roles')->only('create', 'store');
+        $this->middleware('verificar:editar_roles')->only('edit', 'update');
+        $this->middleware('verificar:eliminar_roles')->only('destroy');
+        $this->middleware('verificar:ver_detalle_roles')->only('show');
+    }
     /**
      * Display a listing of the resource.
      */

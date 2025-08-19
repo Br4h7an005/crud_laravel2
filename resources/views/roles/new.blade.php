@@ -24,7 +24,7 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
- 
+{{--  
                 @if(Auth::user()->id_rol === 1)
                 <div class="mt-4">
                 <label class="form-label d-block mb-3 fw-bold fs-5">Permisos</label>
@@ -64,10 +64,10 @@
                                     </label>
                                 </div>
                             </div>
-                        @endforeach --}}
+                        @endforeach 
                     </div>
                 </div>
-                @endif
+                @endif --}}
 
                 <div class="mt-4">
                     <button type="submit" class="btn btn-success">Guardar</button>

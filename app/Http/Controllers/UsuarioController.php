@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Usuarios;
 use App\Models\Roles;
+use App\Models\Acciones;
+use App\Models\Permisos;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +41,8 @@ class UsuarioController extends Controller
     public function create()
     {
         $roles = Roles::all();
-        return view('usuarios.new', compact('roles'));
+        $acciones = Acciones::all();
+        return view('usuarios.new', compact('roles', 'acciones'));
     }
 
     public function store(Request $request)
@@ -57,12 +60,20 @@ class UsuarioController extends Controller
             return back()->withErrors($validated)
                          ->withInput();
         } else {
-            $datos = $request->all();
-            $datos['password'] = Hash::make($datos['password']);
-            Usuarios::create($datos);
+            $datos = $request->all(); // Datos -> Formulario
+            $accion_id = $request->get('accion_id',[]); // Acciones -> Formulario
+            $datos['password'] = Hash::make($datos['password']); // Encriptar contraseña
+            $usuario = Usuarios::create($datos); // Variable -> Guarda Datos -> Inserta -> BD -> Arreglo
+
+            foreach ($accion_id as $id){
+                $permiso = [
+                    'usuario_id' => $usuario->id,
+                    'accion_id' => $id
+                ];
+                Permisos::create($permiso);
+            }
             return redirect('usuarios')->with('type', 'success')
                                            ->with('message', 'Registro creado Correctamente');
-
         }
     }
 
@@ -70,7 +81,12 @@ class UsuarioController extends Controller
     {
         $datos = Usuarios::find($id);
         $roles = Roles::all();
-        return view('usuarios.edit', compact('datos', 'roles'));
+        $permisos = Permisos::where('usuario_id', $id)->get('accion_id');
+        foreach($permisos as $permiso){
+            $permisosAsignados[] = $permiso['accion_id'];
+        }
+        $acciones = Acciones::all();
+        return view('usuarios.edit', compact('datos', 'roles', 'permisos', 'acciones'));
     }
 
     public function update(Request $request, Usuarios $usuario)
@@ -91,13 +107,22 @@ class UsuarioController extends Controller
             $datos = $request->all();
             $datos['password'] = Hash::make($datos['password']);
             $usuario->update($datos);
+            Permisos::where('usuario_id', $usuario->id)->delete();
+            $acciones = $request->all('accion_id');
+            foreach($acciones['accion_id'] as $accion){
+                $permiso['usuario_id'] = $usuario->id;
+                $permiso['accion_id'] = $accion;
+                Permisos::create($permiso);
+            }
+
             return redirect('usuarios')->with('type', 'success')
                                            ->with('message', 'Registro actualizado Correctamente');
         }   
     }
 
     public function destroy(string $id)
-    {
+    {   
+        Permisos::where('usuario_id', $id)->delete();
         Usuarios::destroy($id);
         return redirect('usuarios')->with('type', 'danger')
                                        ->with('message', 'Usuario eliminado correctamente');

@@ -150,6 +150,9 @@
             password: {
                 required: true,
                 minlength: 6
+            },
+            accion_id[] : {
+                required: true
             }
         }
     });

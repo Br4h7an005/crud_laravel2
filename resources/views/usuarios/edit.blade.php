@@ -89,7 +89,9 @@
                                 <div class="card-body">
                                     @foreach($items as $item)
                                         <div class="form-check mb-2">
-                                            <input type="checkbox" id="accion_{{ $item->id }}" name="accion_id[]" class="form-check-input" value="{{ $item->id }}">
+                                            <input type="checkbox" id="accion_{{ $item->id }}" name="accion_id[]" class="form-check-input" value="{{ $item->id }}"
+                                                {{ in_array($item->id, $permisosAsignados ?? []) ? 'checked' : '' }}
+                                            >
                                             <label for="accion_{{ $item->id }}" class="form-check-label" style="cursor: pointer;">
                                                 {{ $item->nombre }}
                                             </label>

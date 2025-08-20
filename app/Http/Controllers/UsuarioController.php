@@ -52,7 +52,8 @@ class UsuarioController extends Controller
             'telefono' => 'required | max:20',
             'id_rol' => 'required',
             'email' => 'required | max:120',
-            'password' => 'required | max:180'
+            'password' => 'required | max:180',
+            'accion_id[]' => 'required'
         ]);
 
         if ($validated->fails())
@@ -65,13 +66,20 @@ class UsuarioController extends Controller
             $datos['password'] = Hash::make($datos['password']); // Encriptar contraseña
             $usuario = Usuarios::create($datos); // Variable -> Guarda Datos -> Inserta -> BD -> Arreglo
 
-            foreach ($accion_id as $id){
-                $permiso = [
-                    'usuario_id' => $usuario->id,
-                    'accion_id' => $id
-                ];
-                Permisos::create($permiso);
+            // foreach ($accion_id as $id){
+            //     $permiso = [
+            //         'usuario_id' => $usuario->id,
+            //         'accion_id' => $id
+            //     ];
+            //     Permisos::create($permiso);
+            // }
+            $permisos = [];
+            foreach($accion_id as $accion){
+                $permisos[] = $accion;
             }
+            $permiso['accion_id'] = json_encode($permisos);
+            $permiso['usuario_id'] = $usuario->id;
+            Permisos::create($permiso);
             return redirect('usuarios')->with('type', 'success')
                                            ->with('message', 'Registro creado Correctamente');
         }
@@ -86,7 +94,7 @@ class UsuarioController extends Controller
             $permisosAsignados[] = $permiso['accion_id'];
         }
         $acciones = Acciones::all();
-        return view('usuarios.edit', compact('datos', 'roles', 'permisos', 'acciones'));
+        return view('usuarios.edit', compact('datos', 'roles', 'permisosAsignados', 'acciones'));
     }
 
     public function update(Request $request, Usuarios $usuario)
@@ -96,7 +104,8 @@ class UsuarioController extends Controller
             'telefono' => 'required | max:20',
             'id_rol' => 'required',
             'email' => 'required | max:120',
-            'password' => 'required | max:180'
+            'password' => 'required | max:180',
+            'accion_id[]' => 'required'
         ]);
 
         if ($validated->fails())
@@ -109,13 +118,20 @@ class UsuarioController extends Controller
             $usuario->update($datos);
             Permisos::where('usuario_id', $usuario->id)->delete();
             $acciones = $request->all('accion_id');
+            // foreach($acciones['accion_id'] as $accion){
+            //     $permiso['usuario_id'] = $usuario->id;
+            //     $permiso['accion_id'] = $accion;
+            //     Permisos::create($permiso);
+            // }
+            $permisos = [];
             foreach($acciones['accion_id'] as $accion){
-                $permiso['usuario_id'] = $usuario->id;
-                $permiso['accion_id'] = $accion;
-                Permisos::create($permiso);
+                $permisos[] = $accion;
             }
+            $permiso['accion_id'] = json_encode($permisos);
+            $permiso['usuario_id'] = $usuario->id;
+            Permisos::create($permiso);
 
-            return redirect('usuarios')->with('type', 'success')
+            return redirect('usuarios')->with('type', 'info')
                                            ->with('message', 'Registro actualizado Correctamente');
         }   
     }

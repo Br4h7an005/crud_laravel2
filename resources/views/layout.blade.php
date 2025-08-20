@@ -16,9 +16,12 @@
         <div class="container d-flex align-items-center justify-content-between">
             
             <!-- Rol del usuario -->
-            <div class="d-flex align-items-center me-4">
+            <div class="d-flex align-items-center me-4 gap-3">
                 <span class="badge bg-primary text-white px-3 py-2 fs-6">
                     <i class="bi bi-person-badge-fill me-1"></i> {{ Auth::user()->rol->nombre }}
+                </span>
+                <span class="badge bg-primary text-white px-3 py-2 fs-6 gap-2">
+                    {{ Auth::user()->nombre }}
                 </span>
             </div>
 
